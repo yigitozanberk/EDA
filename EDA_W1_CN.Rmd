@@ -1,0 +1,239 @@
+---
+title: "EDA_W1_CN"
+author: "yob"
+date: "4/23/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+##Syllabus
+
+- making exploratory graphs
+- principles of analytic graphics
+- plotting systems and graphics devices in R
+- the base, lattice, and ggpolot2 plotting systems in R
+- clustering methods
+- dimension reduction techniques
+
+textbook
+
+https://leanpub.com/exdata
+
+
+## Principles of Analytic Graphics
+
+
+Edward Tufte www.edwardtufte.com
+Beautiful Evidence
+
+# -Principle 1 : Show Comparisons
+evidence is always relative to another competing hypothesis
+always ask "compared to what?"
+
+sets of control groups and experiment groups
+
+important to show comparison "to what"
+
+
+# -Principle 2 : Show causality, mechanism, explanation, systematic structure
+what is your causal framework for thinking about a question?
+
+why does the outcome occur? the cause:
+
+Symptom free days graph, fine particulate matter graph to support the hypothesis that air cleaner cleans the air and helps the lungs of the astma children
+
+# -Principle 3 : Show multivariate data
+
+multivariate = more than 2 variables
+the real world is multivariate
+need to 'escape flatland'
+
+outdoor air pollution graph
+
+1 -higher air pollution lower mortality rate ile paralel gidiyor
+
+2- multivariate data, spring accross different seasons. the relationship is now slightly positive.
+***Simpson's Paradox***
+
+# -Principle 4 : Integration of evidence
+completely integrate words, numbers, images, diagrams
+data graphics should make use of many modes of data presentation
+don't let the tool drive the analysis
+(make the plot you want to make)
+
+-graph on coarse particulate matter and hospitalization rates
+
+# -Principle 5 : Describe and document the evidence with appropriate labels, scales, sources, etc.
+a data graphic should tell a complete story that is credible
+
+# -Principle 6 : Content is king.
+analytical presentations ultimately stand or fall depending on the quality, relevance, and integrity of the content
+
+
+## Exploratory Graphs
+
+- to understand data properties
+- to find patterns in data
+- to suggest modeling strategies
+- to debug analyses
+- to communicate results
+
+#characteristics of exploratory graphs
+they are made quickly
+a large number are made
+the goal is for personal understanding
+axes/legends are generally cleaned up later
+color/size are primarily used for information
+
+#Air pollution dataset
+
+are there any countries in the u.s. that exceed that national standard for fine particle pollution?
+
+```{r}
+library(datasets)
+
+pollution <- read.csv("avgpm25.csv", colClasses = c("numeric", "character", "factor", "numeric", "numeric"))
+
+head(pollution)
+
+#pm25 for average of 2008-2010
+
+
+
+
+```
+
+
+Simple summaries of data
+
+one dimension
+
+-five-number summary
+-boxplots
+-histograms
+-density plot
+-barplot
+
+
+```{r}
+
+#five-number summary (includes mean)
+summary(pollution$pm25)
+
+```
+
+
+```{r}
+boxplot(pollution$pm25, col = "blue")
+
+```
+
+```{r}
+
+hist(pollution$pm25, col = "green")
+rug(pollution$pm25) #plots all the points under the histogram
+#you can see exactly where are the entries
+
+```
+
+a bit more detail about the shape of the distribution
+
+the bulk is centered around 10
+
+```{r}
+
+hist(pollution$pm25, col = "green", breaks = 100)
+rug(pollution$pm25)
+
+
+```
+
+
+
+```{r}
+boxplot(pollution$pm25, col = "blue")
+abline(h = 12)
+#to see what counties are above and below the line
+```
+
+
+```{r}
+hist(pollution$pm25, col = "green")
+abline(v = 12, lwd = 2)
+abline(v = median(pollution$pm25), col = "magenta", lwd = 4)
+
+
+```
+
+```{r}
+barplot(table(pollution$region), col = "wheat", main = "Number of Counties in Each Region")
+```
+
+
+
+##Exploratory Graphs 2
+
+two dimensions
+-multiple/overlayed 1-D plots(lattive/ggplot2)
+-scatterplots
+-smooth scatterplots
+
+- > 2 dimensions
+-overlayed/multiple 2-D plots; coplots
+-use color, size, shape to add dimensions
+-spinning plots(interactive/not the easiest solution)
+-actual 3-D plots(not that useful)
+
+
+```{r}
+boxplot(pm25 ~ region, data = pollution, col = "red")
+```
+
+```{r}
+par(mfrow = c(2,1), mar = c(4,4,2,1))
+hist(subset(pollution, region == "east")$pm25, col = "green")
+hist(subset(pollution, region == "west")$pm25, col = "green")
+```
+
+#Scatterplot
+```{r}
+with(pollution, plot(latitude, pm25))
+abline(h = 12, lwd = 2, lty = 2)
+```
+
+adding color to create depth
+```{r}
+with(pollution, plot(latitude, pm25, col = region))
+abline(h = 12, lwd = 2, lty = 2)
+```
+multiple scatterplots
+```{r}
+par(mfrow = c(1, 2), mar = c(5, 4, 2, 1))
+with(subset(pollution, region == "west"), plot(latitude, pm25, main ="West"))
+with(subset(pollution, region = "east"), plot(latitude, pm25, main = "East"))
+```
+
