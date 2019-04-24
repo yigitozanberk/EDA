@@ -237,3 +237,447 @@ with(subset(pollution, region == "west"), plot(latitude, pm25, main ="West"))
 with(subset(pollution, region = "east"), plot(latitude, pm25, main = "East"))
 ```
 
+##Lesson 2
+Plotting Systems
+Base Plotting System
+Base plotting demonstration
+
+##Plotting Systems in R
+
+3 core plotting systems
+
+# 1)Base Plotting System
+artist's pallette model
+start with blank canvas and build up from there
+start with plot function(or similar)
+use annotation functions to add/modify(text, lines, points, axis)
+
+
+as long as you're keeping track of what you do
+
+plot()
+
+**convenient, mirrors how we think of building plots and analyzing data**
+
+can't go back once plot has started. need to plan in advance
+
+difficult to 'translate' to others once a new plot has been created(no graphical "language")
+
+plot is just a series of R commands
+
+```{r}
+library(datasets)
+
+data(cars)
+
+with(cars, plot(speed, dist))
+
+
+```
+
+
+you could add title, lines, etc.
+
+# 2) the Lattice system
+
+plots are created with a single function call(xyplot, bwplot, etc)
+
+most useful for conditionings types of plots: looking at how y changes with x across leves of z
+
+things like margins/spacing set automatically because entire plot is specified at once
+
+**good for putting many many plots on a screen**
+
+downsides:
+
+sometimes awkward to specify an entire plot in a single function call
+
+annotation in plot is not especially intuitive
+
+use of panel functions and subscripts difficult to wield and requires intense preparation
+
+cannot 'add' to the plot once it is created
+
+```{r}
+library(lattice)
+
+state <- data.frame(state.x77, region = state.region)
+
+xyplot(Life.Exp ~ Income | region, data = state, layout = c(4, 1))
+
+
+```
+
+# 3) ggplot2 system
+
+splits the difference between base and lattice in a number of ways
+
+automatically deals with spacings, text, titles but also allows you to annotate by 'adding' to a plot
+
+superficial similarity to lattice but generally easier/more intuitive to use
+
+default mode makes many chioces for you(but you can still customize to your heart's desire)
+
+```{r}
+library(ggplot2)
+data(mpg)
+qplot(displ, hwy, data = mpg)
+
+
+```
+
+master'da da kullandigim program
+
+
+##Base Plotting System (part 1)
+
+the core plotting engine in R is encapsulated in the following packages:
+
+-graphics
+
+-grDevices
+
+the lattice plotting system is implemented using:
+
+-lattice
+
+-grid
+
+#making a plot
+
+where will the plot be made? on the screen? in a file?
+
+how will the plot be used?
+is the plot for viewing temporarily on the screen
+
+will it be presented in a web browser?
+
+will it eventually end up in a paper that might be printed?
+
+are you using it in a presentation?
+
+is there a large amount of data going into the plot? or is it just a few points?
+
+do you need to be able to dynamically resize the graphic?
+
+
+what graphics system will you use: base, lattice, or ggplot2? you can't mix them
+
+-we focus on using the base plotting system to create graphics on the screen device on this class
+
+#base graphics
+
+2-D graphics
+
+there are two phrases to creating a base plot
+-initializing a new plot
+-annotating an existing plot
+
+calling plot() or hist() will launch a graphics device and draw a new plot on the device
+
+?par will show a lot of parameters in plot
+
+```{r}
+library(datasets)
+
+hist(airquality$Ozone) ##Draw a new plot
+```
+
+```{r}
+with(airquality, plot(Wind, Ozone))
+```
+
+
+```{r}
+airquality <- transform(airquality, Month = factor(Month))
+boxplot(Ozone ~ Month, airquality, xlab = "Month", ylab = "Ozone(ppb)")
+```
+#Some important base graphics parameters
+
+pch : plotting symbol(default circle)
+
+lty : line type(solid line), dashed, dotted, etc.
+
+lwd : line width
+
+col : plotting color
+
+xlab : x axis label
+
+ylab : y axis label
+
+par() for speficying global graphics parameters that affect all plots in an R session
+
+las : orientation of the axis labels on the plot
+
+bg : background color
+
+mar : margin size
+
+oma : outer margin size(default 0)
+
+mfrow : number of plots  per row, column(filled row-wise)
+mfcol : number of plots per row, column (filled column-wise)
+
+to see defaults
+
+```{r}
+par("lty")
+```
+
+```{r}
+par("mar")
+#first number : bottom - 5 lines of margin
+#second : left - 4 lines of margin
+# third : top - 2 lines of margin
+# fourth : right - 2 lines of margin
+# it goes clockwise
+
+```
+
+```{r}
+par("mfrow")
+```
+
+
+#Base plotting system (part 2)
+
+plot: makes a scatterplot, or other type of plot depending on the class of the object being plotted
+
+lines: add lines to a plot, given a vector x values and a corresponding vector of y values(or a 2-column matrix); this function just connects the dots
+
+points : add points to a plot
+
+text : add text labels to a plot using specified x, y coordinates
+
+title: add annotations to x, y axis labels, title, subtitle, outer margin
+
+mtext : add arbitrary text to the margins(inner or outer) of the plot
+
+axis: adding axis ticks/labels
+
+```{r}
+library(datasets)
+with(airquality, plot(Wind, Ozone))
+title(main = "Ozone and Wind in New York City")
+```
+
+```{r}
+with(airquality, plot(Wind, Ozone, main = "Ozone and Wind in New York City"), pch = 20)
+with(subset(airquality, Month == 5), points(Wind, Ozone, col = "blue"))
+with(subset(airquality, Month != 5), points(Wind, Ozone, col = "red"))
+legend("topright", pch = 1, col = c("blue", "red"), legend = c("May", "Other Months"))
+model <- lm(Ozone ~ Wind, airquality)
+abline(model, lwd = 2)
+
+```
+
+```{r}
+par(mfrow = c(1,3), mar = c(4, 4, 2, 1), oma = c(0, 0, 2, 0))
+with(airquality, {
+        plot(Wind, Ozone, main = "Ozone and Wind")
+        plot(Solar.R, Ozone, main = "Ozone and Solar Radiation")
+        plot(Temp, Ozone, main = "Ozone and Temperature")
+        mtext("Ozone and Weather in New York City", outer = TRUE)
+})
+```
+
+## Base Plotting Demonstration
+
+```{r}
+x <- rnorm(100)
+hist(x)
+
+```
+
+```{r}
+y <- rnorm(100)
+plot(x, y)
+```
+
+```{r}
+z <- rnorm(100)
+
+plot(x, z)
+```
+
+```{r}
+plot(x , y , pch = 20)
+```
+
+```{r}
+plot(x, y, pch = 15)
+```
+
+```{r}
+plot(x, y, pch = 3)
+```
+
+```{r}
+example(points) #great to remember!
+```
+
+for items from 21 through 25, you can set boundary with col, and background line colour with bg
+
+```{r}
+x <- rnorm(100)
+y <- rnorm(100)
+z <- rnorm(100)
+plot(x, y, pch = 20)
+title("Scatterplot")
+text(-2, -2, "label")
+legend("topleft", legend = "Data", pch = 20)
+fit <- lm(y ~ x)
+abline(fit)
+abline(fit, lwd = 3)
+abline(fit, lwd = 3, col = "blue")
+plot(x, y, xlab = "weight", ylab = "height", main = "scatterplot", pch  = 20)
+
+
+```
+```{r}
+z <- rpois(100, 2)
+
+par(mfrow = c(2,1))
+plot(x , y, pch = 20)
+plot(x, z , pch = 19)
+```
+
+
+```{r}
+par(mfrow = c(1, 2))
+plot(x, y , pch = 20)
+plot(x, z , pch = 14)
+```
+
+
+
+the points function
+
+```{r}
+x <- rnorm(100)
+y <- x + rnorm(100)
+g <- gl(2, 50)
+g <- gl(2, 50, labels = c("male", "female"))
+plot(x, y) # you can't differentiate
+plot(x, y, type = "n")#make the plot but don't put the data yet
+#adding one group at a time
+points(x[g == "male"], y[g == "male"], col = "green")
+points(x[g == "female"], y[g == "female"], col = "blue")
+#you can also change the symbol
+
+```
+
+##Graphic Devices 
+
+#what is a graphics device
+
+something where you can make a plot appear
+
+- a window on your computer(screen device)
+- a pdf file (file device)
+- a png or jpeg file(file device)
+- a scalable vector graphics(svg) file (file device)
+
+most common place for a plot to be sent is the screen device
+- on mac quartz()
+- on windows windows()
+- on linux/unix x11()
+
+list of devices is found in ?Devices
+
+on a given platform(mac, windows, unix/linux), there is only one screen device
+
+
+for plots that may be printed out or be incorporated into a document, using a file device is more appropriate
+
+there are many different file devices to choose from
+
+you cannot launch windows() on a mac
+
+#How does a plot get created
+
+1- call a plotting function
+
+2- plot appears on the screen device
+
+3- annotate plot if necessary
+
+4- enjoy
+
+```{r}
+with(faithful, plot(eruptions, waiting))
+title(main = "Old Faithful Geyser Data")
+```
+
+second approach to plotting is most commonly used for file devices:
+
+1- explicitly launch a graphics device
+
+2- call a plotting function to make a plot
+it will not appear on the screen
+
+3- annotate plot if necessary
+
+4 - expliocitly close graphics device with dev.off()VERY IMPORTANT
+
+```{r}
+pdf(file = "myplot.pdf")
+with(faithful, plot(eruptions, waiting))
+title(main = "Old Faithful Geyser Data")
+dev.off()
+
+```
+
+#graphics file devices
+
+vector formats, and bitmap devices
+
+vector:
+
+-pdf
+-scg
+-win.metafile
+-postscript
+
+bitmap:
+
+-png
+-jpeg
+-tiff
+-bmp
+
+it is possible to open multiple graphics devices, for example when viewing multiple plots at once
+
+plotting can only occur on one graphics device at a time
+
+currently active graphics device can be found by calling dev.cur()
+
+every open graphics device is assigned an integer >= 2
+
+you can change the actuve graphics device with dev.set(<integer>) where <integer> is the number associated with the graphics device you want to switch to
+
+#copying plots
+
+-dev.cpoy: copy a plot from one device to another
+
+-dev.copy2pdf : specifically copy a plot to a PDF file
+faster, more convenient
+
+```{r}
+with(faithful, plot(eruptions, waiting))
+title(main = "Old Faithful Geyser Data")
+dev.copy(png, file = "geyserplot.png")
+dev.off()
+```
+
+***copying a plot is not an exact operation, so the result may not be identical to the original***
+
+##for swirl
+install_from_swirl("Exploratory Data Analysis")
+```{r}
+install_from_swirl("Exploratory Data Analysis")
+```
+
+
+
