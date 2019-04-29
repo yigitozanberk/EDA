@@ -680,4 +680,53 @@ install_from_swirl("Exploratory Data Analysis")
 ```
 
 
+##Swirl
+
+
+| The "whiskers" of the box (the vertical lines extending above and below the box) relate to
+| the range parameter of boxplot, which we let default to the value 1.5 used by R. The height
+| of the box is the interquartile range, the difference between the 75th and 25th quantiles. In
+| this case that difference is 2.8. The whiskers are drawn to be a length of range*2.8 or
+| 1.5*2.8. This shows us roughly how many, if any, data points are outliers, that is, beyond
+| this range of values.
+
+hist(data)
+rug(data)
+
+reg <- table(pollution$region)
+barplot(reg, col = "wheat", main = "Number of Counties in Each Region")
+
+boxplot(pm25 ~ region, data = pollution, col = "red")
+
+lty = 2 makes the line dashed
+
+
+##| The second is svg which is XML-based, scalable vector graphics. This supports animation and
+##| interactivity and is potentially useful for web-based plots.
+
+---------------------
+
+## base plotting swirl
+
+ names(par())
+ [1] "xlog"      "ylog"      "adj"       "ann"       "ask"       "bg"        "bty"      
+ [8] "cex"       "cex.axis"  "cex.lab"   "cex.main"  "cex.sub"   "cin"       "col"      
+[15] "col.axis"  "col.lab"   "col.main"  "col.sub"   "cra"       "crt"       "csi"      
+[22] "cxy"       "din"       "err"       "family"    "fg"        "fig"       "fin"      
+[29] "font"      "font.axis" "font.lab"  "font.main" "font.sub"  "lab"       "las"      
+[36] "lend"      "lheight"   "ljoin"     "lmitre"    "lty"       "lwd"       "mai"      
+[43] "mar"       "mex"       "mfcol"     "mfg"       "mfrow"     "mgp"       "mkh"      
+[50] "new"       "oma"       "omd"       "omi"       "page"      "pch"       "pin"      
+[57] "plt"       "ps"        "pty"       "smo"       "srt"       "tck"       "tcl"      
+[64] "usr"       "xaxp"      "xaxs"      "xaxt"      "xpd"       "yaxp"      "yaxs"     
+[71] "yaxt"      "ylbias"   
+
+
+
+| The par() function is used to specify global graphics parameters that affect all plots in an
+| R session. **(Use dev.off or plot.new to reset to the defaults.)** These parameters can be
+| overridden when specified as arguments to specific plotting functions. These include las (the
+| orientation of the axis labels on the plot), bg (background color), mar (margin size), oma
+| (outer margin size), mfrow and mfcol (number of plots per row, column).
+
 
