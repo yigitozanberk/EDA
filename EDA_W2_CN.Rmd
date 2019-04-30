@@ -186,3 +186,241 @@ ggplot() is the core function and very flexible for doing things qplot() cannot 
 
 
 
+```{r}
+library(ggplot2)
+str(mpg)
+```
+
+
+
+```{r}
+qplot(displ, hwy, data = mpg)
+```
+
+
+
+modifying aesthetics &classifying by drv column
+
+```{r}
+qplot(displ, hwy, data = mpg, color = drv)
+
+```
+
+front wheel drives have the highest milage
+
+adding a geom (a summary)
+
+```{r}
+qplot(displ, hwy, data = mpg, geom = c("point", "smooth"))
+```
+
+smooth is the blue line that goes accross
+
+
+```{r}
+qplot(hwy, data = mpg, fill = drv)
+#plotting histograms by specifying only one variable
+```
+
+facets
+
+```{r}
+qplot(displ, hwy, data = mpg, facets = .~drv)
+#if you don't want to look at the same graph with different
+#colour data, you can separate the data into different facets
+```
+
+```{r}
+qplot(hwy, data = mpg, facets = drv ~ ., binwidth = 2)
+```
+
+next lecture example not in R
+
+--
+
+
+you can do logs of variables
+
+qplot(log(eno), data = maacs, fill = mopos)
+
+qplot(log(eno), data = maacs, geom = "density")
+
+qplot(log(pm25), log(eno), data = maacs, shape = mopos, color = mopos)
+
++ geom_smooth(method = "lm")
+
+#qplot summary
+syntax somewhere in between base/lattice
+
+produces very nice graphics, essentially publication ready
+
+if you want to customize, use full power of ggplot function
+
+##PArt 3
+
+basic components of a ggplot2 plot
+
+- data frame
+
+-aesthetic mappings
+
+- geoms : geometric object like points, lines, shapes
+
+-facets : for conditional plot
+
+-stats : statistical transformations like binning, quantiles, smoothing
+
+-scales : what scale an aesthetic map uses. example male= red, female = blue
+
+-coordinate system
+
+
+when building plots in ggplot2, the artist's palette model may be the closest analogy.
+
+plots are built up in layers
+
+-plot the data
+-overlay a summary
+- metadata and annotation
+
+
+qplot(logpm25, NocturnalSympt, data = maacs, facets = . ~bmicat, geom = c("point", "smooth"), method = "lm")
+
+working with ggplot
+
+head(maacs[, 1:3])
+
+g <- ggplot(maacs, aes(logpm25, NocturnalSympt))
+
+summary(g)
+
+print(g) 
+Error : No layers in plot
+
+p <- g + geom_point() #save and print ggplot object
+print(p)
+
+g + geom_point() #plot object without saving
+
+defaults are used in geom_point() function because the data has the defaults in ggplot object
+
+##Part 4
+
+adding more layers: smoth
+
+g + geom_point() + geom_smooth()
+
+or
+
+g + geom_point() + geom_smooth(method = "lm") #to eliminate the noise in the default method
+
+facets
+
+g + geom_point() + facet_grid(.~ bmicat) + geom_smooth(method = "lm")
+
+the order doesn't matter, as long as it's between point and smooth function
+
+labels come from the levels of factor variables. you can use them
+
+#annotation
+
+labels : xlab(), ylab(), labs(), ggtile()
+
+each of the 'geom' functions has options to modify
+
+for thins that only make sense globally, use theme()
+like theme(legend.position = "none")
+
+two standard appearance themse are included
+theme_gray() : default theme
+theme_bw() : more stark/plain black and white
+
+
+
+g + geom_point(color = "steelblue", size = 4, alpha = 1/2)
+
+important thing here is, the color, size and alpha are set to constants. you can assign data variables instead of constants.
+
+alpha is transparency
+
++ labs(x = expression("log PM[2.5]"), y = "NocturnalSymptoms")
+
++geom_smooth(size = 4, linetype = 3, method = "lm", se = FALSE)
+
+linetype = 3 is dotted line
+
++theme_bw(base_family = "Times") 
+change the theme to black and white, and change the font to *Times*
+
+
+##Part 5
+
+notes about axis limits
+
+when there are outliers, you may not want to look at the outlier. 
+
+if you do this:
+
+g + geom_line() + ylim(-3, 3)
+
+ggplot function excludes the outlier data. it takes a subset of your data. so your outlier is not included 
+
+but if you do this:
+
+g + geom_line() + coord_cartesian(ylim = c(-3, 3))
+then ggplot also includes the outlier into the plot, but doesn't concentrate on it.
+
+so. if you don't want to lose the outlier, use coord_cartesian(ylim = ...)
+
+
+#more complex examples
+
+varying by 2 variables
+
+NO2 variable is a continuous variable. you can't condition on a continuous variable.so you need to categorize the variable.
+
+cut()
+
+calculate the deciles of the data
+cutpoints <- quantile(maacs$logno2_new, seq(0, 1, length = 4), na.rm= T)
+
+cut the data at the deciles and create a new factor variable
+maacs$no2dec <- cut(maacs$logno2_new, cutpoints)
+
+see the levels of the newly created factor variable
+
+levels(maacs$no2dec)
+
+
+
+g <- ggplot(maacs, aes(logpm25, NocturnalSympt))
+
+g + geom_point(alpha = 1/3) #add points
+ + facet_wrap(bmicat ~ no2dec, nrow = 2, ncol = 4) #make panels
+  + geom_smooth(method = "lm", se = F, col = "steelblue")#add smoother
+  + theme_bw(base_family = "Avenir", base_size = 10) #change theme
+  + labs(x = expression("log " * PM[2.5]))
+  + labs(y = "Nocturnal Symptoms")
+  + labs(title = "MAACS Cohort")
+  
+  
+
+you could save this to a new object. then you could add more layers.
+
+
+#summary
+
+ggplot2 is very powerful and flexible if you learn the 'grammar' and the various elements that can be tuned/modified
+
+
+
+#Swirl
+
+lattice plotting system
+working with colors
+ggplot2 part 1
+ggplot2 part 2
+ggplot2 extras
+
+
+
