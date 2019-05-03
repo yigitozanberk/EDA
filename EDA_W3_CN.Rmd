@@ -390,4 +390,170 @@ the first component explains over %50 of variance. because the shift pattern is 
 
 the second component only captures about 18% of the variation.
 
+#Dimension reduction part 3
+
+one issue with svd or pca is always missing values
+
+```{r}
+dataMatrix2 <- dataMatrixOrdered
+#randomly insert some missing data
+
+dataMatrix2[sample(1:100, size = 40, replace = FALSE)] <- NA
+svd1 <- svd(scale(dataMatrix2)) #Doesn't work!
+```
+
+#one solution - imputing
+
+```{r}
+BiocManager::install("impute")
+library(impute)
+```
+
+```{r}
+dataMatrix2 <- impute.knn(dataMatrix2)$data
+svd1 <- svd(scale(dataMatrixOrdered)); svd2 <- svd(scale(dataMatrix2))
+par(mfrow= c(1,2)); plot(svd1$v[,1], pch = 19); plot(svd2$v[,1], pch = 19)
+
+```
+
+
+takes a missing row and imputes by k nearest neighbours. if k is 5, then it will take 5 rows closest, and impute the data with average of the values.
+
+data on the left is from the original matrix. data on the right is from the imputed data
+
+--face example
+
+if you use 5-10 singular vectors, you get the approximation of the face image
+
+data compression and statistical summaries are two sides of the same coin
+
+#notes and further resources on SVD and PCA
+-scale matters
+
+-PCs/SVs may mix real patterns
+
+-can be computationally intensive(if you have a very large matrix)
+
+-alternatives:
+factor analysis
+independent components analysis
+latent semantic analysis
+
+##Lesson 3
+##Working With Color in R plots
+
+grDevices package has two functions
+colorRamp
+colorRampPalette
+
+these functions take palettes of colors and help interpolate between the colors
+
+the function colors() lists the names of colors you can use in any plotting function.
+
+```{r}
+pal <- colorRamp(c("red", "blue"))
+pal(0)
+```
+
+```{r}
+pal(seq(0, 1, len = 10))
+```
+
+colorRampPalette is similar with slight differences
+
+```{r}
+pal <- colorRampPalette(c("red", "yellow"))
+
+pal(2)
+```
+
+```{r}
+pal(10)
+```
+
+first two digits : red
+second two digits : green
+third two digits : blue
+
+character vector of length 10
+
+#RColorBrewer Package - very useful!!!!!!!!!
+
+one package on CRAN that contains interesting/useful color palettes
+
+there are 3 types of palettes
+-sequential : data from low to high
+-diverging : data that diverge, or deviate from a value(from a mean maybe - can get bigger in two different directions)
+-qualitative : just used to represent data that are not ordered. like factors.
+
+palette information can be used in conjunction with the colorRamp()  and colorRampPalette()
+
+RColorBrewer color table
+top group is for sequential
+middle group is for qualitative 
+bottom group is for diverging
+
+```{r}
+library(RColorBrewer)
+cols <- brewer.pal(3, "BuGn")
+cols
+```
+
+```{r}
+pal <- colorRampPalette(cols)
+image(volcano, col = pal(20))
+```
+
+
+#smoothScatter function
+
+```{r}
+x <- rnorm(10000)
+y <- rnorm(10000)
+smoothScatter(x, y)
+```
+
+2-D histogram of points. default palette is blues. darker blue for higher density, lighter blue for lower density.
+
+rgb function can be used to produce any color via red, green, blue proportions
+
+color transparency can be added via the alpha parameter to rgb. value between 0 and 1. 1 is not transparent. 0 is fully transparent
+
+```{r}
+plot(x, y, pch = 19)
+```
+
+```{r}
+plot(x, y, col = rgb(0, 0, 0, 0.2), pch = 19)
+#red= 0, green= 0, blue= 0, and alpha = 0.2
+```
+
+##Swirl Excercises
+hierarchical clustering
+k means clustering
+dimension reduction
+clustering example
+
+#Hierarchical Clustering
+
+```{r}
+install.packages("fields")
+library(fields)
+```
+
+| In this lesson we'll learn about hierarchical clustering, a simple way of
+| quickly examining and displaying multi-dimensional data. This technique is
+| usually most useful in the early stages of analysis when you're trying to get
+| an understanding of the data, e.g., finding some pattern or relationship
+| between different factors or variables. As the name suggests hierarchical
+| clustering creates a hierarchy of clusters.
+
+
+| We can keep going like this in the obvious way and pair up individual points,
+| but as luck would have it, R provides a simple function which you can call
+| which creates a dendrogram for you. It's called hclust() and takes as an
+| argument the pairwise distance matrix which we looked at before. We've stored
+| this matrix for you in a variable called distxy. Run hclust now with distxy as
+| its argument and put the result in the variable hc.
+
 
