@@ -557,3 +557,282 @@ library(fields)
 | its argument and put the result in the variable hc.
 
 
+##Swirl - K-Means Clustering
+
+| Now we have to calculate distances between each point and every centroid. There are 12
+| data points and 3 centroids. How many distances do we have to calculate?
+
+36
+
+| We've written a function for you called mdist which takes 4 arguments. The vectors of
+| data points (x and y) are the first two and the two vectors of centroid coordinates (cx
+| and cy) are the last two. Call mdist now with these arguments.
+
+| R has a handy function which.min which you can apply to ALL the columns of distTmp with
+| one call. Simply call the R function apply with 3 arguments. The first is distTmp, the
+| second is 2 meaning the columns of distTmp, and the third is which.min, the function you
+| want to apply to the columns of distTmp. Try this now.
+
+
+manuel olarak k-means clustering yaptiriyor
+
+| We can use the R function tapply which applies "a function over a ragged array". This
+| means that every element of the array is assigned a factor and the function is applied
+| to subsets of the array (identified by the factor vector). This allows us to take
+| advantage of the factor vector newClust we calculated. Call tapply now with 3 arguments,
+| x (the data), newClust (the factor array), and mean (the function to apply).
+
+| Now call apply with 3 arguments, distTmp2, 2, and which.min to find the new cluster
+| assignments for the points.
+
+| Now that you've gone through an example step by step, you'll be relieved to hear that R
+| provides a command to do all this work for you. Unsurprisingly it's called kmeans and,
+| although it has several parameters, we'll just mention four. These are x, (the numeric
+| matrix of data), centers, iter.max, and nstart. The second of these (centers) can be
+| either a number of clusters or a set of initial centroids. The third, iter.max,
+| specifies the maximum number of iterations to go through, and nstart is the number of
+| random starts you want to try if you specify centers as a number.
+
+
+| Two iterations as we did before. We just want to emphasize how you can access the
+| information available to you. Let's plot the data points color coded according to their
+| cluster. This was stored in kmObj$cluster. Run plot with 5 arguments. The data, x and y,
+| are the first two; the third, col is set equal to kmObj$cluster, and the last two are
+| pch and cex. The first of these should be set to 19 and the last to 2.
+
+
+##Swirl - Dimension Reduction
+
+| In this lesson we'll discuss principal component analysis (PCA) and singular value
+| decomposition (SVD), two important and related techniques of dimension reduction. This
+| last entails processes which finding subsets of variables in datasets that contain their
+| essences. PCA and SVD are used in both the exploratory phase and the more formal
+| modelling stage of analysis. We'll focus on the exploratory phase and briefly touch on
+| some of the underlying theory.
+
+
+
+| Here U and V each have orthogonal (uncorrelated) columns. U's columns are the left
+| singular vectors of X and V's columns are the right singular vectors of X.  D is a
+| diagonal matrix, by which we mean that all of its entries not on the diagonal are 0. The
+| diagonal entries of D are the singular values of X.
+
+
+| We see that the function returns 3 components, d which holds 2 diagonal elements, u, a 2
+| by 2 matrix, and v, a 3 by 2 matrix. We stored the diagonal entries in a diagonal matrix
+| for you, diag, and we also stored u and v in the variables matu and matv respectively.
+| Multiply matu by diag by t(matv) to see what you get. (This last expression represents
+| the transpose of matv in R). Recall that in R matrix multiplication requires you to use
+| the operator %*%.
+
+| Now we'll talk a little about PCA, Principal Component Analysis, "a simple,
+| non-parametric method for extracting relevant information from confusing data sets."
+| We're quoting here from a very nice concise paper on this subject which can be found at
+| http://arxiv.org/pdf/1404.1100.pdf. The paper by Jonathon Shlens of Google Research is
+| called, A Tutorial on Principal Component Analysis.
+
+http://arxiv.org/pdf/1404.1100.pdf
+
+
+
+
+| We'll demonstrate this now. First we have to scale mat, our simple example data matrix.
+| This means that we subtract the column mean from every element and divide the result by
+| the column standard deviation. Of course R has a command, scale, that does this for you.
+| Run svd on scale of mat.
+
+
+| Why were the first columns of both the U and V matrices so special?  Well as it happens,
+| the D matrix of the SVD explains this phenomenon. It is an aspect of SVD called variance
+| explained. Recall that D is the diagonal matrix sandwiched in between U and V^t in the
+| SVD representation of the data matrix. The diagonal entries of D are like weights for
+| the U and V columns accounting for the variation in the data. They're given in
+| decreasing order from highest to lowest. Look at these diagonal entries now. Recall that
+| they're stored in svd1$d.
+
+
+| Here's a display of these values (on the left). The first one (12.46) is significantly
+| bigger than the others. Since we don't have any units specified, to the right we've
+| plotted the proportion of the variance each entry represents. We see that the first
+| entry accounts for about 40% of the variance in the data. This explains why the first
+| columns of the U and V matrices respectively showed the distinctive patterns in the row
+| and column means so clearly.
+
+
+
+| Now you're probably convinced that SVD and PCA are pretty cool and useful as tools for
+| analysis, but one problem with them that you should be aware of, is that they cannot
+| deal with MISSING data. Neither of them will work if any data in the matrix is missing.
+| (You'll get error messages from R in red if you try.) Missing data is not unusual, so
+| luckily we have ways to work around this problem. One we'll just mention is called
+| imputing the data.
+
+| This uses the k nearest neighbors to calculate a values to use in place of the missing
+| data. You may want to specify an integer k which indicates how many neighbors you want
+| to average to create this replacement value. The bioconductor package
+| (http://bioconductor.org) has an impute package which you can use to fill in missing
+| data. One specific function in it is impute.knn.
+
+##Swirl - Clustering Example
+
+| In this lesson we'll apply some of the analytic techniques we learned in this course to
+| data from the University of California, Irvine. Specifically, the data we'll use is from
+| UCI's Center for Machine Learning and Intelligent Systems. You can find out more about
+| the data at
+| http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones. As
+| this address indicates, the data involves smartphones and recognizing human activity.
+| Cool, right?
+
+
+
+
+| Here we're looking at the 2 left singular vectors of svd1 (the first 2 columns of
+| svd1$u). Each entry of the columns belongs to a particular row with one of the 6
+| activities assigned to it. We see the activities distinguished by color. Moving from
+| left to right, the first section of rows are green (standing), the second red (sitting),
+| the third black (laying), etc.  The first column of u shows separation of the nonmoving
+| (black, red, and green) from the walking activities. The second column is harder to
+| interpret. However, the magenta cluster, which represents walking up, seems separate
+| from the others.
+
+
+| We'll try to figure out why that is. To do that we'll have to find which of the 500+
+| measurements (represented by the columns of sub1) contributes to the variation of that
+| component. **Since we're interested in sub1 columns, we'll look at the RIGHT singular vectors (the columns of svd1$v)**, and in particular, the second one since the separation
+| of the magenta cluster stood out in the second column of svd1$u.
+
+
+
+| Here's a plot of the second column of svd1$v. We used transparency in our plotting but
+| nothing clearly stands out here. Let's use clustering to find the feature (out of the
+| 500+) which contributes the most to the variation of this second column of svd1$v.
+
+| Now create a distance matrix mdist by assigning to it the output of the R command dist
+| using 4 columns of sub1 as the arguments. These 4 columns are 10 through 12 (10:12) and
+| maxCon. Recall that you'll have to concatenate these 2 column expressions when
+| specifying them.
+
+mdist <- dist(sub1[,c(10:12, maxCon)])
+
+Now create hclustering, the output of the R command hclust using mdist as the argument.
+
+Call the myplclust with 2 arguments, hclustering, and lab.col set equal to
+| unclass(sub1$activity).
+
+| Now we see some real separation. Magenta (walking up) is on the far left, and the two
+| other walking activities, the two blues, are on the far right, but in separate clusters
+| from one another. The nonmoving activities still are jumbled together.
+
+
+| Run the R command names with the argument sub1[maxCon] to see what measurement is
+| associated with this maximum contributor.
+
+> names(sub1[maxCon])
+[1] "fBodyAcc.meanFreq...Z"
+
+| Excellent work!
+
+  |=========================================================                        |  70%
+| So the mean body acceleration in the frequency domain in the Z direction is the main
+| contributor to this clustering phenomenon we're seeing. Let's move on to k-means
+| clustering to see if this technique can distinguish between the activities.
+
+
+
+| Create the variable kClust by assigning to it the output of the R command kmeans with 2
+| arguments. The first is sub1 with the last 2 columns removed. (Recall these don't have
+| pertinent information for clustering analysis.) The second argument to kmeans is centers
+| set equal to 6, the number of activities we know we have.
+
+> kClust <- kmeans(sub1[, -c(562, 563)], centers = 6)
+
+| Excellent job!
+
+  |===========================================================                      |  73%
+| Recall that without specifying coordinates for the cluster centroids (as we did), kmeans
+| will generate starting points randomly. Here we did only 1 random start (the default).
+| To see the output, run the R command table with 2 arguments. The first is kClust$cluster
+| (part of the output from kmeans), and the second is sub1$activity.
+
+
+| Your exact output will depend on the state of your random number generator. We notice
+| that when we just run with 1 random start, the clusters tend to group the nonmoving
+| activities together in one cluster. The walking activities seem to cluster individually
+| by themselves. You could run the call to kmeans with one random start again and you'll
+| probably get a slightly different result, but....
+
+...
+
+  |==============================================================                   |  77%
+| ... instead call kmeans with 3 arguments, the last of which will tell it to try more
+| random starts and return the best one. The first 2 arguments should be the same as
+| before (sub1 with the last 2 columns removed and centers set equal to 6). The third is
+| nstart set equal to 100. Put the result in kClust again.
+
+kClust <- kmeans(sub1[, -c(562, 563)], centers = 6, nstart = 100)
+
+| You got it right!
+
+  |===============================================================                  |  78%
+| Again, run the R command table with 2 arguments. The first is kClust$cluster (part of
+| the output from kmeans), and the second is sub1$activity.
+
+
+| Great job!
+
+  |=================================================================                |  80%
+| We see that even with 100 random starts, the passive activities tend to cluster
+| together. One of the clusters contains only laying, but in another cluster, standing and
+| sitting group together.
+
+...
+
+  |==================================================================               |  81%
+| Use dim to find the dimensions of kClust's centers. Use the x$y notation to access them.
+
+> dim(kClust$centers)
+[1]   6 561
+
+| You are really on a roll!
+
+  |===================================================================              |  83%
+| So the centers are a 6 by 561 array. Sometimes it's a good idea to look at the features
+| (columns) of these centers to see if any dominate.
+
+...
+
+  |====================================================================             |  84%
+| Create the variable laying and assign to it the output of the call to the R command
+| which with the argument kClust$size==29.
+
+> laying <- which(kClust$size == 29)
+
+| Excellent work!
+
+  |======================================================================           |  86%
+| Now call plot with 3 arguments. The first is kClust$centers[laying,1:12], and the second
+| is pch set to 19. The third is ylab set equal to "Laying Cluster"
+
+> plot(kClust$centers[laying, 1:12], pch = 19, ylab = "Laying Cluster")
+
+| All that practice is paying off!
+
+  |=======================================================================          |  88%
+| We see the first 3 columns dominate this cluster center. Run names with the first 3
+| columns of sub1 as the argument to remind yourself of what these columns contain.
+
+> names(sub1[, 1:3])
+[1] "tBodyAcc.mean...X" "tBodyAcc.mean...Y" "tBodyAcc.mean...Z"
+
+| Your dedication is inspiring!
+
+  |========================================================================         |  89%
+| So the 3 directions of mean body acceleration seem to have the biggest effect on laying.
+
+...
+
+  |=========================================================================        |  91%
+| Create the variable walkdown and assign to it the output of the call to the R command
+| which with the argument kClust$size==49.
+
+
